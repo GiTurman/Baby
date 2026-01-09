@@ -3,110 +3,96 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>KIDDO</title>
+    <title>KIDDO v3</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap');
-        body { background-color: #fef9f3; font-family: 'Playfair Display', serif; margin: 0; padding: 0; }
-        .login-screen { position: fixed; inset: 0; background: #fef9f3; z-index: 9999; display: flex; align-items: center; justify-content: center; }
-        .card { background: white; border-radius: 30px; border: 1px solid #f3e5d8; box-shadow: 0 10px 30px rgba(0,0,0,0.03); }
-        .btn-warm { background: linear-gradient(135deg, #fb923c, #db2777); color: white; border-radius: 20px; font-weight: bold; }
-        .input-style { border: 1px solid #eee1d5; border-radius: 15px; padding: 12px; outline: none; width: 100%; font-family: sans-serif; }
+        body { background-color: #fef9f3; font-family: 'Playfair Display', serif; }
+        .gate { position: fixed; inset: 0; background: #fef9f3; z-index: 9999; display: flex; align-items: center; justify-content: center; }
     </style>
 </head>
 <body>
 
-    <div id="lock" class="login-screen">
-        <div class="card p-10 w-full max-w-sm text-center mx-4">
-            <h2 class="text-3xl font-bold text-orange-950 mb-6 italic">KIDDO ✨</h2>
-            <div class="space-y-4">
-                <input type="text" id="user" placeholder="სახელი (kiddo)" class="input-style">
-                <input type="password" id="pass" placeholder="პაროლი (0000)" class="input-style">
-                <button onclick="enter()" class="w-full py-4 btn-warm uppercase tracking-widest text-sm">გაღება</button>
-            </div>
-            <p id="error" class="text-red-400 mt-4 text-xs hidden italic">მონაცემები არასწორია</p>
+    <div id="gate" class="gate">
+        <div class="bg-white p-10 rounded-[40px] shadow-2xl w-80 text-center border border-orange-100">
+            <h2 class="text-3xl font-bold mb-6 italic text-orange-950">KIDDO</h2>
+            <input type="text" id="u" placeholder="სახელი" class="w-full p-3 border rounded-xl mb-3 outline-none focus:border-orange-400">
+            <input type="password" id="p" placeholder="პაროლი" class="w-full p-3 border rounded-xl mb-6 outline-none focus:border-orange-400">
+            <button onclick="check()" class="w-full py-4 bg-orange-500 text-white rounded-xl font-bold shadow-lg">გაღება</button>
+            <p id="msg" class="text-red-500 mt-4 hidden">არასწორია!</p>
         </div>
     </div>
 
-    <div id="main" class="max-w-xl mx-auto p-4 md:p-10 hidden">
-        <header class="flex justify-between items-center mb-10">
-            <h1 class="text-3xl font-bold text-orange-950 italic">KIDDO</h1>
-            <button onclick="localStorage.clear(); location.reload();" class="text-[10px] text-gray-400">გამოსვლა</button>
+    <div id="app" class="max-w-xl mx-auto p-6 hidden">
+        <header class="flex justify-between mb-10">
+            <h1 class="text-3xl font-bold italic text-orange-950">KIDDO</h1>
+            <button onclick="localStorage.clear(); location.reload()" class="text-xs text-gray-400">გამოსვლა</button>
         </header>
 
-        <div class="card p-6 mb-12 border-t-8 border-orange-100 shadow-lg">
-            <textarea id="msg" class="w-full text-xl placeholder-orange-200 h-24 outline-none resize-none bg-transparent mb-4" placeholder="რა მოხდა დღეს?"></textarea>
+        <div class="bg-white p-8 rounded-[35px] shadow-sm border border-orange-50 mb-10">
+            <textarea id="txt" class="w-full h-24 text-xl outline-none bg-transparent mb-4" placeholder="რა მოხდა დღეს?"></textarea>
             
-            <div id="preview" class="hidden mb-4 relative">
-                <button onclick="clearImg()" class="absolute top-2 right-2 bg-red-500 text-white w-7 h-7 rounded-full text-xs">✕</button>
-                <img id="pImg" class="w-full h-48 object-cover rounded-2xl shadow-sm">
+            <div class="mb-6 p-3 bg-orange-50 rounded-2xl flex justify-between items-center">
+                <span class="text-[10px] font-bold text-orange-400 uppercase">თარიღი:</span>
+                <input type="date" id="date" class="bg-transparent font-bold text-orange-900 outline-none">
             </div>
 
-            <div class="mb-6 bg-orange-50/50 p-4 rounded-2xl flex items-center justify-between border border-orange-100">
-                <span class="text-[10px] font-bold text-orange-400 uppercase tracking-widest">თარიღი:</span>
-                <input type="date" id="date" class="bg-transparent text-orange-900 font-bold outline-none cursor-pointer">
-            </div>
+            <input type="file" id="file" class="hidden" onchange="preview(this)">
+            <button onclick="document.getElementById('file').click()" class="text-orange-700 text-xs font-bold mb-6">🖼️ ფოტოს დამატება</button>
+            
+            <div id="pBox" class="hidden mb-6"><img id="pImg" class="w-full h-48 object-cover rounded-2xl"></div>
 
-            <div class="flex flex-col gap-4">
-                <input type="file" id="file" accept="image/*" class="hidden" onchange="handleFile(this)">
-                <button onclick="document.getElementById('file').click()" class="text-orange-800 font-bold text-xs self-start px-2 py-1">🖼️ ფოტოს დამატება</button>
-                <button id="save" onclick="save()" class="w-full py-5 btn-warm text-lg shadow-xl active:scale-95 transition">ჩაწერე წიგნში ✨</button>
-            </div>
+            <button id="saveBtn" onclick="save()" class="w-full py-5 bg-gradient-to-r from-orange-400 to-pink-500 text-white rounded-2xl font-bold shadow-xl">ჩაწერე წიგნში ✨</button>
         </div>
 
-        <div id="timeline" class="space-y-12 pb-32"></div>
+        <div id="list" class="space-y-10 pb-20"></div>
     </div>
 
     <script>
         const API = "AIzaSyAGhXxxykU-NrVR7fE_Re6GkRfAB7dI52g";
         let currentImg = null;
 
-        // დღევანდელი თარიღი
         document.getElementById('date').valueAsDate = new Date();
 
-        function enter() {
-            const u = document.getElementById('user').value.toLowerCase().trim();
-            const p = document.getElementById('pass').value.trim();
-            if (u === "kiddo" && p === "0000" || u === "mama" && p === "12345") {
-                localStorage.setItem('k_auth', 'ok');
-                unlock();
+        function check() {
+            const u = document.getElementById('u').value.toLowerCase().trim();
+            const p = document.getElementById('p').value.trim();
+            // პაროლები: kiddo / 0000 ან mama / 12345
+            if ((u === 'kiddo' && p === '0000') || (u === 'mama' && p === '12345')) {
+                localStorage.setItem('k_auth_new', 'true');
+                start();
             } else {
-                document.getElementById('error').classList.remove('hidden');
+                document.getElementById('msg').classList.remove('hidden');
             }
         }
 
-        function unlock() {
-            document.getElementById('lock').classList.add('hidden');
-            document.getElementById('main').classList.remove('hidden');
-            renderAll();
+        function start() {
+            document.getElementById('gate').style.display = 'none';
+            document.getElementById('app').classList.remove('hidden');
+            load();
         }
 
-        if (localStorage.getItem('k_auth') === 'ok') unlock();
+        if (localStorage.getItem('k_auth_new') === 'true') start();
 
-        function handleFile(input) {
+        function preview(input) {
             if (input.files && input.files[0]) {
                 const r = new FileReader();
                 r.onload = e => {
                     currentImg = e.target.result;
                     document.getElementById('pImg').src = currentImg;
-                    document.getElementById('preview').classList.remove('hidden');
+                    document.getElementById('pBox').classList.remove('hidden');
                 };
                 r.readAsDataURL(input.files[0]);
             }
         }
 
-        function clearImg() {
-            currentImg = null;
-            document.getElementById('preview').classList.add('hidden');
-        }
-
         async function save() {
-            const t = document.getElementById('msg').value;
+            const t = document.getElementById('txt').value;
             const d = document.getElementById('date').value;
             if (!t) return;
-
-            const btn = document.getElementById('save');
-            btn.innerText = "KIDDO წერს...";
+            
+            const btn = document.getElementById('saveBtn');
+            btn.innerText = "KIDDO ფიქრობს...";
             btn.disabled = true;
 
             try {
@@ -119,44 +105,26 @@
                 const story = data.candidates[0].content.parts[0].text;
 
                 const item = { id: Date.now(), story, img: currentImg, date: d };
-                const list = JSON.parse(localStorage.getItem('k_history') || '[]');
-                list.unshift(item);
-                localStorage.setItem('k_history', JSON.stringify(list));
+                const history = JSON.parse(localStorage.getItem('k_history_v3') || '[]');
+                history.unshift(item);
+                localStorage.setItem('k_history_v3', JSON.stringify(history));
 
-                document.getElementById('msg').value = "";
-                clearImg();
-                renderAll();
-            } catch (e) {
-                alert("შეცდომაა!");
-            } finally {
-                btn.innerText = "ჩაწერე წიგნში ✨";
-                btn.disabled = false;
-            }
+                location.reload();
+            } catch (e) { alert("შეცდომა!"); }
         }
 
-        function renderAll() {
-            const timeline = document.getElementById('timeline');
-            timeline.innerHTML = "";
-            const list = JSON.parse(localStorage.getItem('k_history') || '[]');
+        function load() {
+            const list = JSON.parse(localStorage.getItem('k_history_v3') || '[]');
+            const container = document.getElementById('list');
             list.forEach(m => {
-                const dateStr = new Date(m.date).toLocaleDateString('ka-GE', { day: 'numeric', month: 'long', year: 'numeric' });
-                timeline.innerHTML += `
-                    <div class="card p-8 border-l-8 border-orange-100 relative group">
-                        <button onclick="del(${m.id})" class="absolute top-4 right-4 text-red-200 opacity-0 group-hover:opacity-100 transition text-[10px]">წაშლა</button>
-                        <p class="text-[10px] font-bold text-orange-300 mb-4 tracking-widest">${dateStr}</p>
-                        ${m.img ? `<img src="${m.img}" class="w-full h-64 object-cover rounded-3xl mb-6 shadow-sm">` : ''}
-                        <p class="text-orange-950 text-xl leading-relaxed italic">${m.story}</p>
+                const ds = new Date(m.date).toLocaleDateString('ka-GE', {day:'numeric', month:'long', year:'numeric'});
+                container.innerHTML += `
+                    <div class="bg-white p-8 rounded-[35px] border-l-8 border-orange-200 relative">
+                        <p class="text-[10px] font-bold text-orange-300 mb-4">${ds}</p>
+                        ${m.img ? `<img src="${m.img}" class="w-full h-56 object-cover rounded-2xl mb-4">` : ''}
+                        <p class="text-orange-950 text-xl italic">${m.story}</p>
                     </div>`;
             });
-        }
-
-        function del(id) {
-            if(confirm('წავშალოთ?')) {
-                let list = JSON.parse(localStorage.getItem('k_history') || '[]');
-                list = list.filter(x => x.id !== id);
-                localStorage.setItem('k_history', JSON.stringify(list));
-                renderAll();
-            }
         }
     </script>
 </body>
