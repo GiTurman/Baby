@@ -3,51 +3,122 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>KIDDO</title>
+    <title>KIDDO - ჩვენი მოგონებები</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        body { background-color: #fdfaf3; font-family: sans-serif; }
-        .card { background: white; border-radius: 30px; box-shadow: 0 10px 30px rgba(0,0,0,0.02); }
+        @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap');
+        
+        body { 
+            background-color: #fef9f3; 
+            font-family: 'Playfair Display', serif;
+            color: #4a3728;
+            background-image: radial-gradient(#f3e5d8 1px, transparent 1px);
+            background-size: 40px 40px;
+        }
+        .card { 
+            background: rgba(255, 255, 255, 0.9); 
+            backdrop-filter: blur(10px); 
+            border-radius: 40px; 
+            border: 1px solid #f3e5d8; 
+            box-shadow: 0 10px 30px rgba(74, 55, 40, 0.03);
+        }
+        .btn-warm { 
+            background: linear-gradient(135deg, #fb923c, #db2777); 
+            color: white; 
+            transition: all 0.3s ease;
+        }
+        .btn-warm:hover { transform: translateY(-2px); opacity: 0.9; }
+        .btn-warm:active { transform: scale(0.95); }
+        .input-style { 
+            background: #fffcf9; 
+            border: 1px solid #eee1d5; 
+            border-radius: 20px; 
+            outline: none; 
+            padding: 12px 20px;
+        }
         .loader { border: 2px solid #f3f3f3; border-radius: 50%; border-top: 2px solid #fb923c; width: 20px; height: 20px; animation: spin 1s linear infinite; display: none; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
     </style>
 </head>
 <body class="p-4 md:p-10">
-    <div class="max-w-xl mx-auto">
-        <h1 class="text-3xl font-bold text-center text-orange-950 mb-10 italic">KIDDO</h1>
 
-        <div class="card p-6 mb-10 border border-orange-50">
-            <textarea id="userNote" class="w-full border-none focus:ring-0 text-xl placeholder-orange-200 h-28 outline-none resize-none bg-transparent" placeholder="აღწერე დღევანდელი წამი..."></textarea>
+    <div id="loginPage" class="max-w-md mx-auto mt-20 p-10 card text-center shadow-2xl">
+        <h2 class="text-3xl font-bold mb-6 text-orange-900 italic">KIDDO</h2>
+        <p class="mb-8 text-orange-600/70 italic text-sm">შეიყვანეთ მონაცემები წიგნის გასახსნელად</p>
+        <div class="space-y-4">
+            <input type="text" id="username" placeholder="სახელი (მაგ: mama)" class="w-full input-style">
+            <input type="password" id="password" placeholder="პაროლი" class="w-full input-style">
+            <button onclick="login()" class="w-full py-4 btn-warm rounded-full font-bold shadow-lg mt-4">გაღება ✨</button>
+        </div>
+        <p id="loginError" class="text-red-400 mt-4 hidden text-sm italic">მონაცემები არასწორია</p>
+    </div>
+
+    <div id="mainApp" class="max-w-2xl mx-auto hidden">
+        <header class="flex justify-between items-end mb-12 px-4">
+            <div>
+                <h1 class="text-4xl font-bold text-orange-950 italic tracking-tighter">KIDDO</h1>
+                <p class="text-orange-600 text-sm italic">ჩვენი დიდი თავგადასავალი</p>
+            </div>
+            <button onclick="logout()" class="text-xs text-gray-400 hover:text-orange-800 transition border-b border-transparent hover:border-orange-800 pb-1">გამოსვლა</button>
+        </header>
+
+        <div class="card p-8 mb-16 border-t-8 border-orange-200 shadow-xl">
+            <textarea id="userNote" class="w-full border-none focus:ring-0 text-xl placeholder-orange-200 h-24 outline-none resize-none bg-transparent mb-4" placeholder="რა მოხდა დღეს?"></textarea>
             
-            <div id="prevBox" class="hidden mb-4 relative">
-                <button onclick="clearImg()" class="absolute top-2 right-2 bg-red-500 text-white w-8 h-8 rounded-full z-10 flex items-center justify-center font-bold">✕</button>
-                <img id="previewImg" class="w-full h-48 object-cover rounded-2xl border border-orange-100">
+            <div id="prevBox" class="hidden mb-6 relative">
+                <button onclick="clearImg()" class="absolute top-3 right-3 bg-red-500 text-white w-8 h-8 rounded-full z-10 flex items-center justify-center font-bold shadow-lg">✕</button>
+                <img id="previewImg" class="w-full h-64 object-cover rounded-[35px] shadow-lg">
             </div>
 
-            <div class="flex flex-col gap-4">
+            <div class="mb-6 bg-orange-50/50 p-4 rounded-2xl">
+                <label class="text-[10px] font-bold text-orange-400 uppercase tracking-widest block mb-2 px-1">მომენტის თარიღი</label>
+                <input type="date" id="customDate" class="bg-transparent border-none outline-none text-orange-900 font-bold">
+            </div>
+
+            <div class="flex flex-col gap-5">
                 <input type="file" id="fInp" accept="image/*" class="hidden" onchange="showPreview(this)">
-                <button onclick="document.getElementById('fInp').click()" class="text-orange-800 font-bold text-sm self-start">🖼️ ფოტოს დამატება</button>
+                <button onclick="document.getElementById('fInp').click()" class="text-orange-800 font-bold text-sm self-start hover:bg-orange-100/50 px-4 py-2 rounded-full transition">🖼️ ფოტოს დამატება</button>
                 
-                <button id="mainBtn" onclick="saveStory()" class="bg-gradient-to-r from-orange-400 to-pink-400 text-white font-bold py-5 rounded-2xl shadow-xl active:scale-95 transition flex items-center justify-center gap-3">
+                <button id="mainBtn" onclick="saveStory()" class="py-5 btn-warm rounded-[25px] shadow-xl flex items-center justify-center gap-3 font-bold text-lg">
                     <span id="btnText">ჩაწერე წიგნში ✨</span>
                     <div id="loader" class="loader"></div>
                 </button>
             </div>
         </div>
 
-        <div id="timeline" class="space-y-8 pb-20"></div>
+        <div id="timeline" class="space-y-16 pb-32 px-2"></div>
     </div>
 
     <script>
         const API_KEY = "AIzaSyAGhXxxykU-NrVR7fE_Re6GkRfAB7dI52g";
         let selectedImg = null;
 
+        // იუზერები და პაროლები
+        const USERS = { "giorgi": "12345", "ana": "54321", "baiko": "0000" };
+
+        // ავტომატური თარიღის დაყენება
+        document.getElementById('customDate').valueAsDate = new Date();
+
+        function login() {
+            const u = document.getElementById('username').value.toLowerCase();
+            const p = document.getElementById('password').value;
+            if(USERS[u] && USERS[u] === p) {
+                document.getElementById('loginPage').classList.add('hidden');
+                document.getElementById('mainApp').classList.remove('hidden');
+                loadTimeline();
+            } else {
+                document.getElementById('loginError').classList.remove('hidden');
+            }
+        }
+
+        function logout() { location.reload(); }
+
         function showPreview(input) {
             if (input.files && input.files[0]) {
                 const reader = new FileReader();
                 reader.onload = e => {
                     selectedImg = e.target.result;
-                    document.getElementById('previewImg').src = e.target.result;
+                    document.getElementById('previewImg').src = selectedImg;
                     document.getElementById('prevBox').classList.remove('hidden');
                 };
                 reader.readAsDataURL(input.files[0]);
@@ -61,47 +132,48 @@
         }
 
         async function askAI(model, prompt) {
-            const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${"AIzaSyAGhXxxykU-NrVR7fE_Re6GkRfAB7dI52g"}`;
+            const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${API_KEY}`;
             const res = await fetch(url, {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
                 body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] })
             });
-            if (!res.ok) throw new Error("Retry");
             const data = await res.json();
             return data.candidates[0].content.parts[0].text;
         }
 
         async function saveStory() {
             const note = document.getElementById('userNote').value;
+            const dateValue = document.getElementById('customDate').value;
+            if (!note) return;
+
             const btn = document.getElementById('mainBtn');
             const loader = document.getElementById('loader');
             const btnText = document.getElementById('btnText');
-
-            if (!note) return;
 
             btn.disabled = true;
             loader.style.display = "inline-block";
             btnText.innerText = "KIDDO წერს...";
 
-            const prompt = `შენ ხარ KIDDO. გადააქციე ეს ფრაზა თბილ მოგონებად ქართულ ენაზე, მაქსიმუმ 100 სიტყვა: "${note}"`;
-
             try {
+                const prompt = `შენ ხარ KIDDO. გადააქციე ეს ფრაზა თბილ მოგონებად ქართულ ენაზე, მაქსიმუმ 100 სიტყვა: "${note}"`;
                 let story;
                 try {
-                    // 1. ვცდილობთ Gemini 3-ს
                     story = await askAI('gemini-3-flash-preview', prompt);
-                } catch (e) {
-                    // 2. თუ Gemini 3-მა 404 დაწერა, ავტომატურად გადადის 1.5-ზე
+                } catch(e) {
                     story = await askAI('gemini-1.5-flash', prompt);
                 }
 
-                render(story, selectedImg);
+                const newMoment = { id: Date.now(), text: story, img: selectedImg, date: dateValue };
+                const moments = JSON.parse(localStorage.getItem('kiddo_storage_v2') || '[]');
+                moments.unshift(newMoment);
+                localStorage.setItem('kiddo_storage_v2', JSON.stringify(moments));
+
+                render(newMoment, true);
                 document.getElementById('userNote').value = "";
                 clearImg();
-
             } catch (err) {
-                alert("სერვერი დროებით მიუწვდომელია. სცადე 1 წუთში.");
+                alert("შეცდომაა, სცადე თავიდან.");
             } finally {
                 btn.disabled = false;
                 loader.style.display = "none";
@@ -109,18 +181,38 @@
             }
         }
 
-        function render(txt, img) {
+        function render(moment, isNew = false) {
             const list = document.getElementById('timeline');
-            const dateStr = new Date().toLocaleDateString('ka-GE', { day: 'numeric', month: 'long' });
+            const dateObj = new Date(moment.date);
+            const d = dateObj.toLocaleDateString('ka-GE', { day: 'numeric', month: 'long', year: 'numeric' });
+            
             const html = `
-                <div class="card p-8 border-l-8 border-orange-400">
-                    <p class="text-[10px] font-bold text-orange-300 uppercase mb-4 tracking-widest">${dateStr}</p>
-                    ${img ? `<img src="${img}" class="w-full h-64 object-cover rounded-2xl mb-6 shadow-sm">` : ''}
-                    <p class="text-orange-950 text-xl leading-relaxed italic font-serif">${txt}</p>
+                <div id="moment-${moment.id}" class="card p-10 border-l-[12px] border-orange-200 relative group transition-all hover:shadow-2xl">
+                    <button onclick="deleteMoment(${moment.id})" class="absolute top-6 right-6 text-red-300 hover:text-red-500 opacity-0 group-hover:opacity-100 transition duration-300">წაშლა</button>
+                    <p class="text-[11px] font-bold text-orange-300 uppercase mb-6 tracking-[0.2em] font-sans">${d}</p>
+                    ${moment.img ? `<img src="${moment.img}" class="w-full h-80 object-cover rounded-[45px] mb-10 shadow-md transform hover:scale-[1.01] transition duration-500">` : ''}
+                    <p class="text-orange-950 text-2xl leading-[1.8] italic font-serif whitespace-pre-line tracking-tight">${moment.text}</p>
                 </div>`;
-            list.insertAdjacentHTML('afterbegin', html);
+            
+            if(isNew) list.insertAdjacentHTML('afterbegin', html);
+            else list.insertAdjacentHTML('beforeend', html);
+        }
+
+        function loadTimeline() {
+            const moments = JSON.parse(localStorage.getItem('kiddo_storage_v2') || '[]');
+            document.getElementById('timeline').innerHTML = "";
+            moments.forEach(m => render(m));
+        }
+
+        function deleteMoment(id) {
+            if(confirm('ნამდვილად გსურთ ამ მოგონების წაშლა?')) {
+                let moments = JSON.parse(localStorage.getItem('kiddo_storage_v2') || '[]');
+                moments = moments.filter(m => m.id !== id);
+                localStorage.setItem('kiddo_storage_v2', JSON.stringify(moments));
+                document.getElementById(`moment-${id}`).style.opacity = '0';
+                setTimeout(() => document.getElementById(`moment-${id}`).remove(), 300);
+            }
         }
     </script>
 </body>
 </html>
-
