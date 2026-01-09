@@ -3,136 +3,159 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>KIDDO - Personal Space</title>
+    <title>KIDDO</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;1,700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap');
         body { background-color: #fef9f3; font-family: 'Playfair Display', serif; }
-        .user-btn { background: white; border: 2px solid #f3e5d8; padding: 20px; border-radius: 20px; width: 100%; font-weight: bold; transition: 0.3s; color: #4a3728; }
-        .user-btn:hover { background: #fffcf9; border-color: #fb923c; transform: translateY(-2px); }
+        .card { background: white; border-radius: 35px; border: 1px solid #f3e5d8; box-shadow: 0 10px 25px rgba(0,0,0,0.02); }
     </style>
 </head>
-<body class="p-6">
+<body class="p-4 md:p-10">
 
-    <div id="loginSection" class="max-w-sm mx-auto mt-20 text-center">
-        <h1 class="text-4xl font-bold text-orange-950 mb-10 italic">KIDDO</h1>
-        <p class="text-sm text-orange-400 mb-8 uppercase tracking-widest">აირჩიე შენი სახელი</p>
-        <div class="space-y-4">
-            <button onclick="startSession('Giorgi')" class="user-btn">Giorgi</button>
-            <button onclick="startSession('Ana')" class="user-btn">Ana</button>
-            <button onclick="startSession('Baiko')" class="user-btn">Baiko</button>
+    <div id="loginGate" class="fixed inset-0 bg-[#fef9f3] z-[9999] flex items-center justify-center">
+        <div class="card p-10 w-full max-w-sm text-center mx-4">
+            <h2 class="text-4xl font-bold text-orange-950 mb-10 italic">KIDDO</h2>
+            <div class="grid gap-4">
+                <button onclick="enter('Giorgi')" class="py-4 bg-white border-2 border-orange-100 rounded-2xl font-bold text-orange-900 hover:bg-orange-50 transition">Giorgi</button>
+                <button onclick="enter('Ana')" class="py-4 bg-white border-2 border-orange-100 rounded-2xl font-bold text-orange-900 hover:bg-orange-50 transition">Ana</button>
+                <button onclick="enter('Baiko')" class="py-4 bg-white border-2 border-orange-100 rounded-2xl font-bold text-orange-900 hover:bg-orange-50 transition">Baiko</button>
+            </div>
         </div>
     </div>
 
-    <div id="mainApp" class="max-w-xl mx-auto hidden pt-10">
-        <div class="flex justify-between items-center mb-10">
-            <h2 id="welcome" class="text-3xl font-bold text-orange-900 italic"></h2>
-            <button onclick="localStorage.removeItem('activeUser'); location.reload()" class="text-xs text-gray-400 underline">გამოსვლა</button>
-        </div>
+    <div id="mainApp" class="max-w-xl mx-auto hidden">
+        <header class="flex justify-between items-center mb-10">
+            <h1 class="text-3xl font-bold text-orange-950 italic">KIDDO</h1>
+            <div class="text-right">
+                <p id="userLabel" class="text-[10px] text-orange-500 font-bold uppercase tracking-widest"></p>
+                <button onclick="localStorage.removeItem('k_user'); location.reload()" class="text-[10px] text-gray-400 underline">გამოსვლა</button>
+            </div>
+        </header>
 
-        <div class="bg-white p-8 rounded-[40px] shadow-sm border border-orange-100 mb-10">
-            <textarea id="note" class="w-full text-xl outline-none bg-transparent mb-6 h-24" placeholder="რა მოხდა დღეს?"></textarea>
+        <div class="card p-8 mb-12 border-t-8 border-orange-100">
+            <textarea id="noteInp" class="w-full text-xl outline-none bg-transparent mb-6 h-24" placeholder="რა მოხდა დღეს?"></textarea>
             
-            <div id="previewBox" class="hidden mb-6"><img id="previewImg" class="w-full h-48 object-cover rounded-2xl"></div>
-
-            <div class="flex items-center justify-between mb-8 p-4 bg-orange-50 rounded-2xl">
-                <span class="text-[10px] font-bold text-orange-400 uppercase">თარიღი:</span>
-                <input type="date" id="eventDate" class="bg-transparent font-bold text-orange-900 outline-none">
+            <div id="pBox" class="hidden mb-6 relative">
+                <button onclick="clearImg()" class="absolute top-2 right-2 bg-red-500 text-white w-6 h-6 rounded-full text-xs">✕</button>
+                <img id="pImg" class="w-full h-56 object-cover rounded-[30px]">
             </div>
 
-            <input type="file" id="fileInp" class="hidden" onchange="handleFile(this)">
-            <button onclick="document.getElementById('fileInp').click()" class="text-orange-800 text-xs font-bold mb-8">🖼️ ფოტოს დამატება</button>
+            <div class="mb-8 p-4 bg-orange-50/50 rounded-2xl flex justify-between items-center border border-orange-100">
+                <span class="text-[10px] font-bold text-orange-400 uppercase">თარიღი:</span>
+                <input type="date" id="mDate" class="bg-transparent font-bold text-orange-900 outline-none cursor-pointer">
+            </div>
+
+            <input type="file" id="fInp" class="hidden" onchange="preview(this)">
+            <button onclick="document.getElementById('fInp').click()" class="text-orange-800 text-xs font-bold mb-8 hover:underline">🖼️ ფოტოს დამატება</button>
             
-            <button id="saveBtn" onclick="saveMoment()" class="w-full py-5 bg-gradient-to-r from-orange-400 to-pink-500 text-white rounded-2xl font-bold shadow-xl">ჩაწერე წიგნში ✨</button>
+            <button id="saveBtn" onclick="save()" class="w-full py-5 bg-gradient-to-r from-orange-400 to-pink-500 text-white rounded-2xl font-bold shadow-xl active:scale-95 transition">ჩაწერე წიგნში ✨</button>
         </div>
 
-        <div id="timeline" class="space-y-10 pb-32"></div>
+        <div id="feed" class="space-y-12 pb-32"></div>
     </div>
 
     <script>
-        const API_KEY = "AIzaSyAGhXxxykU-NrVR7fE_Re6GkRfAB7dI52g";
-        let activeUser = localStorage.getItem('activeUser');
-        let imgData = null;
+        const KEY = "AIzaSyAGhXxxykU-NrVR7fE_Re6GkRfAB7dI52g";
+        let user = localStorage.getItem('k_user');
+        let img = null;
 
-        document.getElementById('eventDate').valueAsDate = new Date();
+        document.getElementById('mDate').valueAsDate = new Date();
 
-        function startSession(name) {
-            localStorage.setItem('activeUser', name);
-            activeUser = name;
-            loadApp();
+        function enter(name) {
+            localStorage.setItem('k_user', name);
+            user = name;
+            init();
         }
 
-        function loadApp() {
-            if (!activeUser) return;
-            document.getElementById('loginSection').classList.add('hidden');
+        function init() {
+            if (!user) return;
+            document.getElementById('loginGate').style.display = 'none';
             document.getElementById('mainApp').classList.remove('hidden');
-            document.getElementById('welcome').innerText = activeUser;
-            renderMoments();
+            document.getElementById('userLabel').innerText = `ავტორი: ${user}`;
+            render();
         }
 
-        if (activeUser) loadApp();
+        if (user) init();
 
-        function handleFile(input) {
+        function preview(input) {
             if (input.files && input.files[0]) {
-                const reader = new FileReader();
-                reader.onload = e => {
-                    imgData = e.target.result;
-                    document.getElementById('previewImg').src = imgData;
-                    document.getElementById('previewBox').classList.remove('hidden');
+                const r = new FileReader();
+                r.onload = e => {
+                    img = e.target.result;
+                    document.getElementById('pImg').src = img;
+                    document.getElementById('pBox').classList.remove('hidden');
                 };
-                reader.readAsDataURL(input.files[0]);
+                r.readAsDataURL(input.files[0]);
             }
         }
 
-        async function saveMoment() {
-            const text = document.getElementById('note').value;
-            const date = document.getElementById('eventDate').value;
-            if (!text) return;
+        function clearImg() {
+            img = null;
+            document.getElementById('pBox').classList.add('hidden');
+            document.getElementById('fInp').value = "";
+        }
+
+        async function save() {
+            const txt = document.getElementById('noteInp').value;
+            const date = document.getElementById('mDate').value;
+            if (!txt) return;
 
             const btn = document.getElementById('saveBtn');
-            btn.innerText = "KIDDO წერს...";
+            btn.innerText = "KIDDO ფიქრობს...";
             btn.disabled = true;
 
             try {
-                const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${API_KEY}`, {
+                // ზუსტი API მისამართი (v1beta)
+                const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${KEY}`, {
                     method: 'POST',
                     headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({ contents: [{ parts: [{ text: `შენ ხარ KIDDO. გადააქციე ეს ფრაზა თბილ მოგონებად ქართულ ენაზე: "${text}"` }] }] })
+                    body: JSON.stringify({ contents: [{ parts: [{ text: `შენ ხარ KIDDO. გადააქციე ეს ფრაზა თბილ მოგონებად ქართულ ენაზე (100 სიტყვა): "${txt}"` }] }] })
                 });
+                
                 const data = await res.json();
                 const story = data.candidates[0].content.parts[0].text;
 
-                const storageKey = `kiddo_data_${activeUser}`;
-                const history = JSON.parse(localStorage.getItem(storageKey) || '[]');
-                history.unshift({ id: Date.now(), story, img: imgData, date });
-                localStorage.setItem(storageKey, JSON.stringify(history));
+                const dbKey = `kiddo_data_${user}`;
+                const history = JSON.parse(localStorage.getItem(dbKey) || '[]');
+                history.unshift({ id: Date.now(), story, img, date });
+                localStorage.setItem(dbKey, JSON.stringify(history));
 
-                location.reload();
-            } catch (e) { alert("შეცდომაა!"); btn.disabled = false; btn.innerText = "ჩაწერე წიგნში ✨"; }
+                document.getElementById('noteInp').value = "";
+                clearImg();
+                render();
+            } catch (e) {
+                alert("ბოდიში, კავშირი გაწყდა. სცადე თავიდან.");
+            } finally {
+                btn.innerText = "ჩაწერე წიგნში ✨";
+                btn.disabled = false;
+            }
         }
 
-        function renderMoments() {
-            const history = JSON.parse(localStorage.getItem(`kiddo_data_${activeUser}`) || '[]');
-            const container = document.getElementById('timeline');
+        function render() {
+            const container = document.getElementById('feed');
             container.innerHTML = "";
+            const history = JSON.parse(localStorage.getItem(`kiddo_data_${user}`) || '[]');
+            
             history.forEach(m => {
-                const d = new Date(m.date).toLocaleDateString('ka-GE', {day:'numeric', month:'long', year:'numeric'});
+                const d = new Date(m.date).toLocaleDateString('ka-GE', { day: 'numeric', month: 'long', year: 'numeric' });
                 container.innerHTML += `
-                    <div class="bg-white p-8 rounded-[35px] border-l-8 border-orange-100 relative">
-                        <button onclick="deleteMe(${m.id})" class="absolute top-4 right-4 text-red-200 text-[10px]">წაშლა</button>
-                        <p class="text-[10px] font-bold text-orange-300 mb-4">${d}</p>
-                        ${m.img ? `<img src="${m.img}" class="w-full h-56 object-cover rounded-2xl mb-4 shadow-sm">` : ''}
-                        <p class="text-orange-950 text-xl italic">${m.story}</p>
+                    <div class="card p-10 border-l-[10px] border-orange-100 relative group">
+                        <button onclick="del(${m.id})" class="absolute top-4 right-4 text-red-200 opacity-0 group-hover:opacity-100 transition text-[10px]">წაშლა</button>
+                        <p class="text-[10px] font-bold text-orange-300 uppercase mb-6 tracking-widest">${d}</p>
+                        ${m.img ? `<img src="${m.img}" class="w-full h-72 object-cover rounded-[40px] mb-8 shadow-sm">` : ''}
+                        <p class="text-orange-950 text-2xl leading-relaxed italic">${m.story}</p>
                     </div>`;
             });
         }
 
-        function deleteMe(id) {
-            const key = `kiddo_data_${activeUser}`;
-            let list = JSON.parse(localStorage.getItem(key) || '[]');
-            list = list.filter(x => x.id !== id);
-            localStorage.setItem(key, JSON.stringify(list));
-            renderMoments();
+        function del(id) {
+            if(!confirm('წავშალოთ?')) return;
+            const dbKey = `kiddo_data_${user}`;
+            let history = JSON.parse(localStorage.getItem(dbKey) || '[]');
+            history = history.filter(x => x.id !== id);
+            localStorage.setItem(dbKey, JSON.stringify(history));
+            render();
         }
     </script>
 </body>
