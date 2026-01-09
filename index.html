@@ -112,7 +112,7 @@
             btn.disabled = true;
 
             try {
-                const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${API}`, {
+                const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${"AIzaSyAGhXxxykU-NrVR7fE_Re6GkRfAB7dI52g"}`, {
                     method: 'POST',
                     headers: {'Content-Type': 'application/json'},
                     body: JSON.stringify({ contents: [{ parts: [{ text: `შენ ხარ KIDDO. გადააქციე ეს ფრაზა თბილ მოგონებად ქართულ ენაზე: "${txt}"` }] }] })
@@ -162,3 +162,4 @@
     </script>
 </body>
 </html>
+
