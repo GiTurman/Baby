@@ -39,7 +39,7 @@
     </div>
 
     <script>
-        const API_KEY = "AIzaSyDm5B64HwQ43WtoNiPEWluf0lDY75918HY";
+        const API_KEY = "AIzaSyAGhXxxykU-NrVR7fE_Re6GkRfAB7dI52g";
         let selectedImg = null;
 
         function showPreview(input) {
@@ -61,7 +61,7 @@
         }
 
         async function askAI(model, prompt) {
-            const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${"AIzaSyDm5B64HwQ43WtoNiPEWluf0lDY75918HY"}`;
+            const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${"AIzaSyAGhXxxykU-NrVR7fE_Re6GkRfAB7dI52g"}`;
             const res = await fetch(url, {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
@@ -123,3 +123,4 @@
     </script>
 </body>
 </html>
+
